@@ -1,0 +1,41 @@
+<main style="padding: 2rem; font-family: sans-serif; max-width: 800px; margin: auto;">
+  <h1>{{ title }}</h1>
+  <p>Projeto AIRDATA</p>
+
+  <hr>
+
+  <div class="busca-container">
+    <label for="cidade"><strong>Consulte a qualidade do ar em sua cidade:</strong></label>
+    <br>
+    <input id="cidade" type="text" [(ngModel)]="cidadeInput" (keyup.enter)="buscarQualidadeDoAr()" placeholder="Ex: São Paulo, Rio de Janeiro...">
+    <button (click)="buscarQualidadeDoAr()" [disabled]="isLoading">
+      {{ isLoading ? 'Buscando...' : 'Buscar Dados' }}
+    </button>
+  </div>
+
+  <hr>
+
+  <div class="resultado-container">
+    <div *ngIf="isLoading">
+      <p>Carregando...</p>
+    </div>
+
+    <div *ngIf="errorMessage">
+      <p style="color: red;"><strong>Erro:</strong> {{ errorMessage }}</p>
+    </div>
+
+    <div *ngIf="airQualityData && airQualityData.status === 'ok'">
+      <h2>Resultados para: {{ airQualityData.data.city.name }}</h2>
+      <p><em>Leitura de: {{ airQualityData.data.time.s | date: 'dd/MM/yyyy HH:mm' }}</em></p>
+
+      <h3>Índice de Qualidade do Ar (AQI):
+        <strong style="font-size: 1.5em;">
+          {{ airQualityData.data.aqi }}
+        </strong>
+      </h3>
+      <p>Nível de dominância do poluente: <strong>{{ airQualityData.data.dominentpol }}</strong></p>
+    </div>
+  </div>
+</main>
+
+<router-outlet></router-outlet>
