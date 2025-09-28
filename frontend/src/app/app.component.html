@@ -24,16 +24,33 @@
       <p style="color: red;"><strong>Erro:</strong> {{ errorMessage }}</p>
     </div>
 
-    <div *ngIf="airQualityData && airQualityData.status === 'ok'">
-      <h2>Resultados para: {{ airQualityData.data.city.name }}</h2>
-      <p><em>Leitura de: {{ airQualityData.data.time.s | date: 'dd/MM/yyyy HH:mm' }}</em></p>
+    <div *ngIf="airQualityData as aqiData">
 
-      <h3>Índice de Qualidade do Ar (AQI):
-        <strong style="font-size: 1.5em;">
-          {{ airQualityData.data.aqi }}
-        </strong>
-      </h3>
-      <p>Nível de dominância do poluente: <strong>{{ airQualityData.data.dominentpol }}</strong></p>
+      <div *ngIf="aqiData.dadosApiExterna">
+        <h2>Resultados para: {{ aqiData.dadosApiExterna.city.name }}</h2>
+        <p><em>Leitura de: {{ aqiData.dadosApiExterna.time.s | date: 'dd/MM/yyyy HH:mm' }}</em></p>
+
+        <h3>Índice de Qualidade do Ar (AQI):
+          <strong style="font-size: 1.5em;">
+            {{ aqiData.dadosApiExterna.aqi }}
+          </strong>
+          <span *ngIf="aqiData.classificacaoRisco"
+                class="classificacao-texto"
+                [ngClass]="formatCssClass(aqiData.classificacaoRisco)">
+            ({{ aqiData.classificacaoRisco }})
+          </span>
+        </h3>
+        <p>Poluente dominante: <strong>{{ aqiData.dadosApiExterna.dominentpol }}</strong></p>
+
+        <div *ngIf="aqiData.recomendacoes && aqiData.recomendacoes.length > 0" style="margin-top: 1.5rem; border-top: 1px solid #ccc; padding-top: 1rem;">
+          <h4>Recomendações de Saúde:</h4>
+          <ul style="padding-left: 20px;">
+            <li *ngFor="let rec of aqiData.recomendacoes" style="margin-bottom: 8px;">
+              {{ rec }}
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </main>

@@ -1,17 +1,25 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AirQualityService } from './services/air-quality.service';
+import { AirQualityResponse } from './models/airquality-response.model';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    FormsModule
+  ],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  standalone: false
+  styleUrls: ['./app.component.scss']
 })
-
 export class AppComponent {
   title = 'Monitoramento da Qualidade do Ar';
   cidadeInput: string = 'São Paulo';
-  airQualityData: any = null;
+  airQualityData: AirQualityResponse | null = null;
   isLoading: boolean = false;
   errorMessage: string | null = null;
 
@@ -35,11 +43,14 @@ export class AppComponent {
 
     this.airQualityService.getDataForCity(cidadeFormatada).subscribe({
       next: (data) => {
-        this.airQualityData = data;
         this.isLoading = false;
-        if (data.status === 'error') {
-          this.errorMessage = `Não foram encontrados dados para "${this.cidadeInput}". Verifique o nome e tente novamente.`;
+        if (data && data.classificacaoRisco) {
+          this.airQualityData = data;
+          this.errorMessage = null;
+        } else {
+          // Se não, exibe uma mensagem de erro amigável
           this.airQualityData = null;
+          this.errorMessage = `Não foram encontrados dados para "${this.cidadeInput}". Verifique o nome e tente novamente.`;
         }
       },
       error: (err) => {
@@ -48,5 +59,13 @@ export class AppComponent {
         console.error(err);
       }
     });
+  }
+
+  formatCssClass(classification: string): string {
+    if (!classification) {
+      return '';
+    }
+    const formattedClass = classification.toLowerCase().replace(/ /g, '-');
+    return 'risco-' + formattedClass;
   }
 }

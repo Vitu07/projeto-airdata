@@ -1,5 +1,6 @@
 package br.com.cruzeirodosul.airquality.backend.controller;
 
+import br.com.cruzeirodosul.airquality.backend.dto.AirQualityResponseDTO;
 import br.com.cruzeirodosul.airquality.backend.service.AirQualityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,8 @@ public class AirQualityController {
     private AirQualityService service;
 
     @GetMapping
-    public ResponseEntity<String> getAirQualityByCity(@RequestParam("city") String city){
-        String response = service.getAirQualityDataForCity(city);
-
+    public ResponseEntity<AirQualityResponseDTO> getAirQualityByCity(@RequestParam("city") String city){
+        AirQualityResponseDTO response = service.getAirQualityDataForCity(city);
         return ResponseEntity.ok(response);
     }
 }
