@@ -1,58 +1,75 @@
-<main style="padding: 2rem; font-family: sans-serif; max-width: 800px; margin: auto;">
-  <h1>{{ title }}</h1>
-  <p>Projeto AIRDATA</p>
-
-  <hr>
-
-  <div class="busca-container">
-    <label for="cidade"><strong>Consulte a qualidade do ar em sua cidade:</strong></label>
-    <br>
-    <input id="cidade" type="text" [(ngModel)]="cidadeInput" (keyup.enter)="buscarQualidadeDoAr()" placeholder="Ex: São Paulo, Rio de Janeiro...">
-    <button (click)="buscarQualidadeDoAr()" [disabled]="isLoading">
-      {{ isLoading ? 'Buscando...' : 'Buscar Dados' }}
-    </button>
+<header class="app-header">
+  <div class="logo-container">
+    <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <path fill="#00000" d="M205 52c-23 5-40 18-50 38-6 14-8 30-5 35 4 6 11 6 16 2 2-3 3-5 3-8 0-15 9-31 23-40 20-13 48-8 63 12 6 8 9 15 10 26 1 14-4 25-13 36-7 7-17 12-26 14l-76 1c-76 0-75 0-78 5-2 4-1 9 2 12l3 3h75c84 0 82 0 97-8 11-5 24-18 29-29 6-12 7-19 7-31 0-17-5-31-15-44a69 69 0 0 0-65-24z"/><path d="M380 130a69 69 0 0 0-56 64c0 8 1 10 5 13 7 3 15-2 15-10 0-6 2-15 6-22 4-8 13-16 22-21 7-4 8-4 20-4s13 0 20 4c18 8 28 25 28 43 0 9-1 14-5 22-3 7-14 18-21 21-11 6-4 6-187 6H58l-3 3c-3 2-4 3-4 7 1 3 1 5 4 7l3 3h171c168 0 172 0 180-2 13-3 21-8 31-18 14-14 20-29 20-49 1-19-6-34-19-48-7-6-10-9-18-12-14-7-29-10-43-7zM95 325l-4 4c-2 4-1 9 3 12l3 3h111c121 0 117 0 128 6 11 5 20 15 24 28 2 5 2 8 2 16 0 10-1 11-4 18-8 18-25 28-43 28-14 0-24-4-34-14l-9-12c-3-6-6-16-6-22 0-9-11-13-18-6-2 2-2 3-2 12 1 16 8 30 20 43 9 8 20 15 31 18 10 2 27 2 37-1 31-10 51-39 49-70-2-30-22-54-51-62-7-2-10-2-121-2l-116 1z"/>
+    </svg>
+    <h1>AIRDATA</h1>
   </div>
+</header>
 
-  <hr>
+<main class="main-content">
+  <section class="search-section">
+    <h2>Consulte a qualidade do ar em tempo real</h2>
+    <p>Digite o nome de uma cidade para ver o índice e as recomendações de saúde.</p>
+    <div class="search-box">
+      <input id="cidade" type="text" [(ngModel)]="cidadeInput" (keyup.enter)="buscarQualidadeDoAr()" placeholder="Ex: São Paulo, London, Tokyo...">
+      <button (click)="buscarQualidadeDoAr()" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Buscar</span>
+        <span *ngIf="isLoading">Buscando...</span>
+      </button>
+    </div>
+  </section>
 
-  <div class="resultado-container">
-    <div *ngIf="isLoading">
-      <p>Carregando...</p>
+  <section class="result-section">
+    <div *ngIf="isLoading" class="feedback-card">
+      <p>Carregando dados...</p>
+    </div>
+    <div *ngIf="errorMessage" class="feedback-card error">
+      <p><strong>Erro:</strong> {{ errorMessage }}</p>
     </div>
 
-    <div *ngIf="errorMessage">
-      <p style="color: red;"><strong>Erro:</strong> {{ errorMessage }}</p>
-    </div>
-
-    <div *ngIf="airQualityData as aqiData">
-
+    <div *ngIf="airQualityData as aqiData" class="result-card">
       <div *ngIf="aqiData.dadosApiExterna">
-        <h2>Resultados para: {{ aqiData.dadosApiExterna.city.name }}</h2>
-        <p><em>Leitura de: {{ aqiData.dadosApiExterna.time.s | date: 'dd/MM/yyyy HH:mm' }}</em></p>
 
-        <h3>Índice de Qualidade do Ar (AQI):
-          <strong style="font-size: 1.5em;">
-            {{ aqiData.dadosApiExterna.aqi }}
-          </strong>
-          <span *ngIf="aqiData.classificacaoRisco"
-                class="classificacao-texto"
-                [ngClass]="formatCssClass(aqiData.classificacaoRisco)">
-            ({{ aqiData.classificacaoRisco }})
-          </span>
-        </h3>
-        <p>Poluente dominante: <strong>{{ aqiData.dadosApiExterna.dominentpol }}</strong></p>
+        <div class="card-header">
+          <svg class="location-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path fill="#00000" d="M238 42a148 148 0 0 0-127 174c10 42 37 87 81 139 14 16 54 57 58 60h12c4-3 44-44 58-61 45-52 73-100 82-141 2-12 2-39 0-51A149 149 0 0 0 238 42zm36 23c14 3 23 5 35 11a124 124 0 0 1 72 107c1 21-4 41-18 68-18 38-48 78-94 125l-13 14-6-6-45-49c-41-49-67-95-73-129A125 125 0 0 1 275 66z"/><path d="M241 134c-24 6-42 29-42 54 0 17 5 30 17 42 11 11 24 16 40 16s29-5 40-16c24-23 23-59 0-82-6-6-17-12-26-14-7-2-22-2-29 0zm27 23c23 9 30 40 12 57a34 34 0 0 1-48 0 34 34 0 0 1 1-51l10-6c7-3 18-3 25 0zM152 357c-20 9-35 21-40 32-4 8-5 19-3 26 7 21 36 39 77 48 45 10 95 10 140 0 16-3 28-7 42-14 25-12 37-28 36-47-1-18-17-33-44-45-11-5-16-5-20-1-6 6-5 15 3 19 20 8 30 15 35 22s4 13-4 21c-22 21-84 34-143 29-40-3-75-14-91-28-10-9-11-14-6-22 5-7 15-14 35-22 7-4 9-13 3-19-4-4-9-4-20 1z"/>
+          </svg>
+          <h3>{{ aqiData.dadosApiExterna.city.name }}</h3>
+        </div>
 
-        <div *ngIf="aqiData.recomendacoes && aqiData.recomendacoes.length > 0" style="margin-top: 1.5rem; border-top: 1px solid #ccc; padding-top: 1rem;">
-          <h4>Recomendações de Saúde:</h4>
-          <ul style="padding-left: 20px;">
-            <li *ngFor="let rec of aqiData.recomendacoes" style="margin-bottom: 8px;">
+        <div class="card-body">
+          <div class="aqi-display">
+            <div class="aqi-value">{{ aqiData.dadosApiExterna.aqi }}</div>
+            <div class="aqi-label">IQAr</div>
+          </div>
+
+          <div class="risk-display" [ngClass]="formatCssClass(aqiData.classificacaoRisco)">
+            <svg class="risk-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+              <path fill="currentColor" d="M1 260c5-3 10-4 16-3h36l6-1-10-26c-10-33-10-66 6-97 17-33 43-54 79-62 21-4 41-3 61 3 21 7 42 16 61 28 2 2 4 2 6 0 16-10 34-18 52-25 17-6 34-9 52-8 22 1 43 7 60 21 27 20 44 45 48 79 4 25 0 50-9 73-3 6-2 7 4 7h34c4 0 7 1 10 4v9c-3 3-7 3-12 3h-42c-3 0-5 2-7 4-10 19-23 36-38 52l-19 21a758 758 0 0 1-124 97l-8 5h-6c-19-9-36-22-53-34a994 994 0 0 1-59-49l-35-35c-13-14-26-30-36-46-3-4-6-6-11-6H11c-4 0-7 0-10-4v-10m327-82 18 57c3-1 4-3 5-5l10-15c5-7 13-6 17 1l17 29c2 3 3 4 6 4h38c3 0 4-1 6-4 6-14 10-28 13-42a101 101 0 0 0-36-94 93 93 0 0 0-75-21c-29 4-55 17-80 33-6 4-9 4-14 1-20-13-40-24-62-30-22-7-44-8-66 0-17 7-32 18-43 32a97 97 0 0 0-22 57c-1 25 6 49 18 71 2 4 4 5 8 5h65c4 0 6-2 8-5l35-70 4-4c7-3 11-1 14 8l25 65 21 54 24-80 21-73c1-4 4-6 8-6 5 0 8 2 9 6l8 26m-136 45-22 45c-3 4-6 6-11 6H99l-7 1 1 2a403 403 0 0 0 84 89c25 20 51 40 78 57 3 2 6 2 9 0 25-16 49-34 73-53 10-9 21-17 30-27a449 449 0 0 0 66-78l-35 1c-10 0-15-4-18-12l-12-19-17 25c-2 4-5 6-9 5-4 0-7-3-8-7l-14-47-9-25-16 54-27 93c-1 4-3 8-8 8s-8-2-10-8a2787 2787 0 0 0-42-108l-8-17-8 15z"/>
+            </svg>
+            <span *ngIf="aqiData.classificacaoRisco" class="classificacao-texto">
+              {{ aqiData.classificacaoRisco }}
+            </span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <p>Poluente Dominante: <strong>{{ aqiData.dadosApiExterna.dominentpol }}</strong></p>
+          <p><em>Atualizado em: {{ aqiData.dadosApiExterna.time.s | date: 'dd/MM/yyyy HH:mm' }}</em></p>
+        </div>
+
+        <div *ngIf="aqiData.recomendacoes && aqiData.recomendacoes.length > 0" class="recommendations">
+          <h4>Recomendações de Saúde</h4>
+          <ul>
+            <li *ngFor="let rec of aqiData.recomendacoes">
               {{ rec }}
             </li>
           </ul>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </main>
 
 <router-outlet></router-outlet>

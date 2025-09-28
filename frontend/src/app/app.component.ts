@@ -48,7 +48,6 @@ export class AppComponent {
           this.airQualityData = data;
           this.errorMessage = null;
         } else {
-          // Se não, exibe uma mensagem de erro amigável
           this.airQualityData = null;
           this.errorMessage = `Não foram encontrados dados para "${this.cidadeInput}". Verifique o nome e tente novamente.`;
         }
