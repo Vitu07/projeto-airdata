@@ -1,7 +1,11 @@
 package br.com.cruzeirodosul.airquality.backend.service;
 
 import br.com.cruzeirodosul.airquality.backend.dto.AirQualityResponseDTO;
+import br.com.cruzeirodosul.airquality.backend.dto.HistoricoDTO;
+import br.com.cruzeirodosul.airquality.backend.dto.MedicaoDiariaDTO;
+import br.com.cruzeirodosul.airquality.backend.model.Medicao;
 import br.com.cruzeirodosul.airquality.backend.model.NivelRisco;
+import br.com.cruzeirodosul.airquality.backend.repository.MedicaoRepository;
 import br.com.cruzeirodosul.airquality.backend.repository.NivelRiscoRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.Collections;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +29,9 @@ public class AirQualityService {
 
     @Autowired
     private NivelRiscoRepository nivelRiscoRepository;
+
+    @Autowired
+    private MedicaoRepository medicaoRepository;
 
     @Value("${API_URL}")
     private String apiURL;
@@ -71,5 +80,37 @@ public class AirQualityService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public HistoricoDTO getDadosHistoricos(Integer localizacaoId) {
+        OffsetDateTime seteDiasAtras = OffsetDateTime.now().minusDays(7);
+
+        List<Medicao> medicoes = medicaoRepository.findLast7DaysByLocation(localizacaoId, seteDiasAtras);
+
+        if (medicoes == null || medicoes.isEmpty()) {
+            return new HistoricoDTO();
+        }
+
+        IntSummaryStatistics stats = medicoes.stream()
+                .mapToInt(Medicao::getValorAqi)
+                .summaryStatistics();
+
+        List<MedicaoDiariaDTO> historicoParaGrafico = medicoes.stream()
+                .map(medicao -> {
+                    MedicaoDiariaDTO medicaoDTO = new MedicaoDiariaDTO();
+                    medicaoDTO.setData(medicao.getDataHora().toLocalDate());
+                    medicaoDTO.setValorAqi(medicao.getValorAqi());
+                    medicaoDTO.setNomePoluente(medicao.getPoluenteDominante().getNome());
+                    return medicaoDTO;
+                })
+                .collect(Collectors.toList());
+
+        HistoricoDTO dto = new HistoricoDTO();
+        dto.setAqiMax(stats.getMax());
+        dto.setAqiMin(stats.getMin());
+        dto.setAqiAvg(stats.getAverage());
+        dto.setHistoricoDiario(historicoParaGrafico);
+
+        return dto;
     }
 }

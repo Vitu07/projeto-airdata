@@ -7,7 +7,6 @@ import java.util.List;
 public class AirQualityResponseDTO {
 
     private JsonNode dadosApiExterna;
-
     private String classificacaoRisco;
     private List<String> recomendacoes;
 
