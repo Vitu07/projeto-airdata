@@ -1,0 +1,51 @@
+<div *ngIf="historicoData as histData; else loading">
+
+  <div *ngIf="histData.historicoDiario && histData.historicoDiario.length > 0; else noData">
+    <div class="dashboard-container">
+      <h3>Análise dos Últimos 7 Dias</h3>
+
+      <div class="stats-cards">
+        <div class="stat-card">
+          <span class="label">IQAr Mín.</span>
+          <span class="value">{{ histData.aqiMin }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="label">IQAr Méd.</span>
+          <span class="value">{{ histData.aqiAvg | number:'1.0-1' }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="label">IQAr Máx.</span>
+          <span class="value">{{ histData.aqiMax }}</span>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <ngx-charts-line-chart
+          [results]="chartData"
+          [xAxis]="true"
+          [yAxis]="true"
+          [showXAxisLabel]="showXAxisLabel"
+          [showYAxisLabel]="showYAxisLabel"
+          [xAxisLabel]="xAxisLabel"
+          [yAxisLabel]="yAxisLabel"
+          [scheme]="colorScheme"
+          [autoScale]="true"
+          [timeline]="true">
+        </ngx-charts-line-chart>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<ng-template #loading>
+  <div *ngIf="isLoading">
+    <p style="text-align: center; padding: 1rem;">Carregando dados históricos...</p>
+  </div>
+</ng-template>
+
+<ng-template #noData>
+  <div *ngIf="!isLoading" style="text-align: center; padding: 1rem; color: #6c757d;">
+    <p>Não há dados históricos disponíveis para esta localidade no momento.</p>
+  </div>
+</ng-template>

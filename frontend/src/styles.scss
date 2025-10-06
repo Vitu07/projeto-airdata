@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 $primary-color: #007bff;
+$border-color: #dee2e6;
 
 :root {
   --background-color: #f4f7f6;
   --card-background: #ffffff;
   --text-color: #212529;
   --text-light-color: #6c757d;
-  --border-color: #dee2e6;
   --shadow-color: rgba(0, 0, 0, 0.08);
 }
 
@@ -80,6 +80,17 @@ html, body {
   border-radius: 50px;
   overflow: hidden;
   border: 1px solid var(--border-color);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease; // Adiciona uma transição suave
+
+
+  &:hover {
+    border-color: darken($border-color, 15%);
+  }
+
+  &:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 20px rgba(0, 123, 255, 0.25);
+  }
 }
 
 .search-box input {
@@ -197,18 +208,83 @@ html, body {
   margin-top: 1rem;
   border-top: 1px solid var(--border-color);
 }
+
 .recommendations h4 {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
   text-align: center;
+  color: var(--text-color);
 }
+
 .recommendations ul {
-  padding-left: 20px;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
 }
 
 .recommendations li {
-  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
   line-height: 1.6;
+  color: var(--text-light-color);
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
+
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.info-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--primary-color);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+
+  width: 220px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 0.9rem;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -110px;
+
+  transition: opacity 0.3s;
+}
+
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -220,4 +296,11 @@ html, body {
   &.risco-ruim { color: #fd7e14; }
   &.risco-muito-ruim { color: #dc3545; }
   &.risco-péssima { color: #800080; }
+}
+
+.info-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--primary-color);
+  cursor: pointer;
 }

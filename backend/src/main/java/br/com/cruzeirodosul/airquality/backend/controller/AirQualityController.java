@@ -26,8 +26,8 @@ public class AirQualityController {
     }
 
     @GetMapping("/history")
-    public ResponseEntity<HistoricoDTO> getHistory(@RequestParam Integer locationId) {
-        HistoricoDTO historico = service.getDadosHistoricos(locationId);
+    public ResponseEntity<HistoricoDTO> getHistory(@RequestParam String cityName) {
+        HistoricoDTO historico = service.getDadosHistoricos(cityName);
         return ResponseEntity.ok(historico);
     }
 }

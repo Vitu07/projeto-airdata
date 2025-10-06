@@ -3,8 +3,10 @@ package br.com.cruzeirodosul.airquality.backend.service;
 import br.com.cruzeirodosul.airquality.backend.dto.AirQualityResponseDTO;
 import br.com.cruzeirodosul.airquality.backend.dto.HistoricoDTO;
 import br.com.cruzeirodosul.airquality.backend.dto.MedicaoDiariaDTO;
+import br.com.cruzeirodosul.airquality.backend.model.Localizacao;
 import br.com.cruzeirodosul.airquality.backend.model.Medicao;
 import br.com.cruzeirodosul.airquality.backend.model.NivelRisco;
+import br.com.cruzeirodosul.airquality.backend.repository.LocalizacaoRepository;
 import br.com.cruzeirodosul.airquality.backend.repository.MedicaoRepository;
 import br.com.cruzeirodosul.airquality.backend.repository.NivelRiscoRepository;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,6 +21,7 @@ import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.IntSummaryStatistics;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +35,9 @@ public class AirQualityService {
 
     @Autowired
     private MedicaoRepository medicaoRepository;
+
+    @Autowired
+    private LocalizacaoRepository localizacaoRepository;
 
     @Value("${API_URL}")
     private String apiURL;
@@ -82,14 +88,17 @@ public class AirQualityService {
         }
     }
 
-    public HistoricoDTO getDadosHistoricos(Integer localizacaoId) {
-        OffsetDateTime seteDiasAtras = OffsetDateTime.now().minusDays(7);
+    public HistoricoDTO getDadosHistoricos(String cityName) {
+        Optional<Localizacao> localizacaoOpt = localizacaoRepository.findByNomeCidade(cityName);
 
-        List<Medicao> medicoes = medicaoRepository.findLast7DaysByLocation(localizacaoId, seteDiasAtras);
-
-        if (medicoes == null || medicoes.isEmpty()) {
+        if (localizacaoOpt.isEmpty()) {
             return new HistoricoDTO();
         }
+
+        Integer localizacaoId = localizacaoOpt.get().getId();
+
+        OffsetDateTime seteDiasAtras = OffsetDateTime.now().minusDays(7);
+        List<Medicao> medicoes = medicaoRepository.findLast7DaysByLocation(localizacaoId, seteDiasAtras);
 
         IntSummaryStatistics stats = medicoes.stream()
                 .mapToInt(Medicao::getValorAqi)

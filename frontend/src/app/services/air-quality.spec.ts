@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AirQuality } from './air-quality.service';
+import { AirQualityService } from './air-quality.service';
 
 describe('AirQuality', () => {
-  let service: AirQuality;
+  let service: AirQualityService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(AirQuality);
+    service = TestBed.inject(AirQualityService);
   });
 
   it('should be created', () => {

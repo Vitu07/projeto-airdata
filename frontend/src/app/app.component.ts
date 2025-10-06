@@ -4,6 +4,7 @@ import { RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AirQualityService } from './services/air-quality.service';
 import { AirQualityResponse } from './models/airquality-response.model';
+import { DashboardHistoricoComponent } from './components/dashboard-historico/dashboard-historico.component';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,8 @@ import { AirQualityResponse } from './models/airquality-response.model';
   imports: [
     CommonModule,
     RouterOutlet,
-    FormsModule
+    FormsModule,
+    DashboardHistoricoComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
