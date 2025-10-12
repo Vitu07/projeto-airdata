@@ -72,18 +72,18 @@
             Inclui crianças, idosos e pessoas com doenças respiratórias e cardíacas.
         </span>
               </div>
-
               <span>{{ rec }}</span>
-
             </li>
           </ul>
         </div>
 
-        <app-dashboard-historico [locationName]="aqiData.dadosApiExterna.city.name"></app-dashboard-historico>
+        <app-dashboard-historico
+          *ngIf="cidadePesquisada"
+          [locationName]="cidadePesquisada">
+        </app-dashboard-historico>
 
       </div>
     </div>
   </section>
 </main>
-
 <router-outlet></router-outlet>

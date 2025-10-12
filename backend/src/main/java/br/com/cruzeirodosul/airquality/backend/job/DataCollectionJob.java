@@ -1,11 +1,12 @@
 package br.com.cruzeirodosul.airquality.backend.job;
 
+import br.com.cruzeirodosul.airquality.backend.model.Localizacao;
+import br.com.cruzeirodosul.airquality.backend.repository.LocalizacaoRepository;
 import br.com.cruzeirodosul.airquality.backend.service.DataCollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -14,21 +15,29 @@ public class DataCollectionJob {
     @Autowired
     private DataCollectionService dataCollectionService;
 
-    private final List<String> CIDADES_MONITORADAS = Arrays.asList("sao-paulo", "osasco", "campinas",
-            "santos", "guarulhos", "sao-bernardo-do-campo", "sao-jose-dos-campos", "ribeirao-preto",
-            "sorocaba", "maua", "jundiai", "carapicuiba", "piracicaba", "bauru", "cubatao", "taubate",
-            "tatui", "americana", "limeira", "sao-sebastiao", "presidente-prudente", "sao-jose-do-rio-preto");
+    @Autowired
+    private LocalizacaoRepository localizacaoRepository;
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = " 0 30 *  * * ?")
     public void coletarEgravarDados() {
-        System.out.println("--- INICIANDO JOB DE COLETA DE DADOS ---");
-        CIDADES_MONITORADAS.forEach(cidade -> {
+        System.out.println("--- INICIANDO JOB DE COLETA DE DADOS HORÁRIA ---");
+
+        List<Localizacao> cidadesMonitoradas = localizacaoRepository.findAll();
+
+        if (cidadesMonitoradas.isEmpty()) {
+            System.out.println("Nenhuma cidade encontrada no banco de dados para monitorar.");
+            return;
+        }
+
+        System.out.println("Monitorando " + cidadesMonitoradas.size() + " cidades.");
+
+        cidadesMonitoradas.forEach(localizacao -> {
             try {
-                dataCollectionService.buscarESalvarDadosDaApi(cidade);
+                dataCollectionService.coletarESalvarDadosAtuais(localizacao);
             } catch (Exception e) {
-                System.err.println("Falha ao coletar dados para a cidade: " + cidade + ". Erro: " + e.getMessage());
+                System.err.println("Falha ao coletar dados para a cidade: " + localizacao.getNomeCidade() + ". Erro: " + e.getMessage());
             }
         });
-        System.out.println("--- JOB DE COLETA DE DADOS FINALIZADO ---");
+        System.out.println("--- JOB DE COLETA DE DADOS HORÁRIA FINALIZADO ---");
     }
 }

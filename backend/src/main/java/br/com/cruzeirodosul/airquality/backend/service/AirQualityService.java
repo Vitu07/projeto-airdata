@@ -17,11 +17,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.IntSummaryStatistics;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,7 +92,8 @@ public class AirQualityService {
     }
 
     public HistoricoDTO getDadosHistoricos(String cityName) {
-        Optional<Localizacao> localizacaoOpt = localizacaoRepository.findByNomeCidade(cityName);
+
+        Optional<Localizacao> localizacaoOpt = localizacaoRepository.findByNomeCidadeUnaccentIgnoreCase(cityName);
 
         if (localizacaoOpt.isEmpty()) {
             return new HistoricoDTO();
@@ -100,16 +104,41 @@ public class AirQualityService {
         OffsetDateTime seteDiasAtras = OffsetDateTime.now().minusDays(7);
         List<Medicao> medicoes = medicaoRepository.findLast7DaysByLocation(localizacaoId, seteDiasAtras);
 
+        if (medicoes.isEmpty()) {
+            return new HistoricoDTO();
+        }
+
         IntSummaryStatistics stats = medicoes.stream()
                 .mapToInt(Medicao::getValorAqi)
                 .summaryStatistics();
 
-        List<MedicaoDiariaDTO> historicoParaGrafico = medicoes.stream()
-                .map(medicao -> {
+        Map<LocalDate, List<Medicao>> medicoesPorDia = medicoes.stream()
+                .collect(Collectors.groupingBy(medicao -> medicao.getDataHora().toLocalDate()));
+
+        List<MedicaoDiariaDTO> historicoParaGrafico = medicoesPorDia.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(entry -> {
+                    LocalDate dia = entry.getKey();
+                    List<Medicao> medicoesDoDia = entry.getValue();
+
+                    double aqiMedio = medicoesDoDia.stream()
+                            .mapToInt(Medicao::getValorAqi)
+                            .average()
+                            .orElse(0.0);
+
+                    String poluenteMaisFrequente = medicoesDoDia.stream()
+                            .filter(m -> m.getPoluenteDominante() != null)
+                            .map(m -> m.getPoluenteDominante().getNome())
+                            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                            .entrySet().stream()
+                            .max(Map.Entry.comparingByValue())
+                            .map(Map.Entry::getKey)
+                            .orElse("N/D");
+
                     MedicaoDiariaDTO medicaoDTO = new MedicaoDiariaDTO();
-                    medicaoDTO.setData(medicao.getDataHora().toLocalDate());
-                    medicaoDTO.setValorAqi(medicao.getValorAqi());
-                    medicaoDTO.setNomePoluente(medicao.getPoluenteDominante().getNome());
+                    medicaoDTO.setData(dia);
+                    medicaoDTO.setValorAqi((int) Math.round(aqiMedio));
+                    medicaoDTO.setNomePoluente(poluenteMaisFrequente);
                     return medicaoDTO;
                 })
                 .collect(Collectors.toList());

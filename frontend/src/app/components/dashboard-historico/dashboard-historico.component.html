@@ -1,9 +1,7 @@
 <div *ngIf="historicoData as histData; else loading">
-
   <div *ngIf="histData.historicoDiario && histData.historicoDiario.length > 0; else noData">
     <div class="dashboard-container">
       <h3>Análise dos Últimos 7 Dias</h3>
-
       <div class="stats-cards">
         <div class="stat-card">
           <span class="label">IQAr Mín.</span>
@@ -17,25 +15,26 @@
           <span class="label">IQAr Máx.</span>
           <span class="value">{{ histData.aqiMax }}</span>
         </div>
+        <div class="stat-card">
+          <span class="label">Poluente Predominante</span>
+          <span class="value">{{ poluentePredominantePeriodo | uppercase }}</span>
+        </div>
       </div>
-
       <div class="chart-container">
-        <ngx-charts-line-chart
-          [results]="chartData"
-          [xAxis]="true"
-          [yAxis]="true"
-          [showXAxisLabel]="showXAxisLabel"
-          [showYAxisLabel]="showYAxisLabel"
-          [xAxisLabel]="xAxisLabel"
-          [yAxisLabel]="yAxisLabel"
-          [scheme]="colorScheme"
-          [autoScale]="true"
-          [timeline]="true">
+        <ngx-charts-line-chart [results]="chartData" [xAxis]="true" [yAxis]="true" [showXAxisLabel]="showXAxisLabel" [showYAxisLabel]="showYAxisLabel" [xAxisLabel]="xAxisLabel" [yAxisLabel]="yAxisLabel" [scheme]="colorScheme" [autoScale]="true" [timeline]="false">
+          <ng-template #seriesTooltipTemplate let-model="model">
+            <div class="custom-tooltip">
+              <div class="tooltip-header">{{ model[0].name | date: 'dd/MM/yyyy' }}</div>
+              <div class="tooltip-body">
+                <strong>IQAr:</strong> {{ model[0].value }}<br>
+                <strong>Poluente:</strong> {{ model[0].extra?.poluente | uppercase }}
+              </div>
+            </div>
+          </ng-template>
         </ngx-charts-line-chart>
       </div>
     </div>
   </div>
-
 </div>
 
 <ng-template #loading>

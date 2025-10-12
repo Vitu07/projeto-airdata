@@ -9,18 +9,13 @@ import { DashboardHistoricoComponent } from './components/dashboard-historico/da
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    FormsModule,
-    DashboardHistoricoComponent
-  ],
+  imports: [ CommonModule, RouterOutlet, FormsModule, DashboardHistoricoComponent ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'Monitoramento da Qualidade do Ar';
   cidadeInput: string = 'São Paulo';
+  cidadePesquisada: string | null = null;
   airQualityData: AirQualityResponse | null = null;
   isLoading: boolean = false;
   errorMessage: string | null = null;
@@ -36,26 +31,20 @@ export class AppComponent {
     this.isLoading = true;
     this.errorMessage = null;
     this.airQualityData = null;
+    this.cidadePesquisada = null;
 
-    const cidadeFormatada = this.cidadeInput
-      .trim()
-      .toLowerCase()
-      .replace(/ /g, '-')
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-    this.airQualityService.getDataForCity(cidadeFormatada).subscribe({
+    this.airQualityService.getDataForCity(this.cidadeInput.trim().toLowerCase()).subscribe({
       next: (data) => {
         this.isLoading = false;
         if (data && data.classificacaoRisco) {
           this.airQualityData = data;
-          this.errorMessage = null;
+          this.cidadePesquisada = this.cidadeInput;
         } else {
-          this.airQualityData = null;
           this.errorMessage = `Não foram encontrados dados para "${this.cidadeInput}". Verifique o nome e tente novamente.`;
         }
       },
       error: (err) => {
-        this.errorMessage = 'Ocorreu um erro ao se comunicar com o servidor. Verifique se o backend está rodando.';
+        this.errorMessage = 'Ocorreu um erro ao se comunicar com o servidor.';
         this.isLoading = false;
         console.error(err);
       }
@@ -63,10 +52,7 @@ export class AppComponent {
   }
 
   formatCssClass(classification: string): string {
-    if (!classification) {
-      return '';
-    }
-    const formattedClass = classification.toLowerCase().replace(/ /g, '-');
-    return 'risco-' + formattedClass;
+    if (!classification) return '';
+    return 'risco-' + classification.toLowerCase().replace(/ /g, '-');
   }
 }
