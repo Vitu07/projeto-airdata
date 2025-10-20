@@ -40,3 +40,44 @@ h3 {
 .chart-container {
   height: 300px;
 }
+
+.stats-cards {
+  .stat-card:first-child {
+    .value {
+      color: #28a745;
+    }
+  }
+
+  .stat-card:nth-child(2) {
+    .value {
+      color: #dfae07;
+    }
+  }
+
+  .stat-card:nth-child(3) {
+    .value {
+      color: #dc3545;
+    }
+  }
+}
+
+/* --- Media Queries para Responsividade Móvel --- */
+@media (max-width: 768px) {
+
+  .stats-cards {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .chart-container {
+    height: 250px;
+  }
+
+  .stat-card {
+    padding: 0.8rem;
+  }
+
+  .stat-card .value {
+    font-size: 1.6rem;
+  }
+}
