@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { AirQualityService } from './services/air-quality.service';
 import { AirQualityResponse } from './models/airquality-response.model';
 import { DashboardHistoricoComponent } from './components/dashboard-historico/dashboard-historico.component';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +21,19 @@ export class AppComponent {
   isLoading: boolean = false;
   errorMessage: string | null = null;
 
+  private blockedCities = new Set([
+    'taboao da serra',
+    'itaquaquecetuba',
+    'barueri',
+    'santo andre',
+    'ribeirao pires',
+    'embu das artes',
+    'itapecerica da serra',
+    'diadema',
+    'poa',
+    'piedade'
+  ]);
+
   constructor(private airQualityService: AirQualityService) {}
 
   buscarQualidadeDoAr() {
@@ -28,17 +42,32 @@ export class AppComponent {
       return;
     }
 
+    const cidadeFormatada = this.cidadeInput.trim().toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, '');
+
+    if (this.blockedCities.has(cidadeFormatada)) {
+      this.errorMessage = `A localização "${this.cidadeInput}" não é suportada no momento.`;
+      this.airQualityData = null;
+      this.cidadePesquisada = null;
+      this.isLoading = false;
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = null;
     this.airQualityData = null;
     this.cidadePesquisada = null;
 
-    this.airQualityService.getDataForCity(this.cidadeInput.trim().toLowerCase()).subscribe({
+    this.airQualityService.getDataForCity(cidadeFormatada)
+      .pipe(
+        finalize(() => this.isLoading = false)
+      )
+      .subscribe({
       next: (data) => {
         this.isLoading = false;
         if (data && data.classificacaoRisco) {
           this.airQualityData = data;
-          this.cidadePesquisada = this.cidadeInput;
+          this.cidadePesquisada = cidadeFormatada;
         } else {
           this.errorMessage = `Não foram encontrados dados para "${this.cidadeInput}". Verifique o nome e tente novamente.`;
         }
