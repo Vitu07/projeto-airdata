@@ -80,6 +80,64 @@ export class AppComponent {
     });
   }
 
+  buscarPorGeolocalizacao(): void {
+    if (!navigator.geolocation) {
+      this.errorMessage = 'Geolocalização não é suportada pelo seu navegador.';
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.airQualityData = null;
+    this.cidadePesquisada = null;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        this.airQualityService.getDataByCoords(latitude, longitude)
+          .pipe(
+            finalize(() => this.isLoading = false)
+          )
+          .subscribe({
+            next: (data) => {
+              if (data && data.classificacaoRisco) {
+                this.airQualityData = data;
+                const nomeCidadeRetornada = data.dadosApiExterna.city.name.split(',')[0].trim();
+                this.cidadePesquisada = nomeCidadeRetornada;
+                this.cidadeInput = nomeCidadeRetornada;
+              } else {
+                this.errorMessage = 'Não foram encontrados dados de qualidade do ar para sua localização atual.';
+              }
+            },
+            error: (err) => {
+              this.errorMessage = 'Ocorreu um erro ao buscar dados para sua localização.';
+              console.error(err);
+            }
+          });
+      },
+      (error) => {
+        this.isLoading = false;
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            this.errorMessage = 'Você negou a permissão para acessar a localização.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            this.errorMessage = 'Informações de localização não estão disponíveis.';
+            break;
+          case error.TIMEOUT:
+            this.errorMessage = 'A requisição para obter a localização expirou.';
+            break;
+          default:
+            this.errorMessage = 'Ocorreu um erro desconhecido ao obter a localização.';
+            break;
+        }
+        console.error('Erro de Geolocalização:', error);
+      }
+    );
+  }
+
   formatCssClass(classification: string): string {
     if (!classification) return '';
     return 'risco-' + classification.toLowerCase().replace(/ /g, '-');

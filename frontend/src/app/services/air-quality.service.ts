@@ -20,7 +20,15 @@ export class AirQualityService{
     return this.http.get<AirQualityResponse>(fullUrl, { params });
   }
 
-  public getHistoryForLocationName(cityName: string): Observable<HistoricoDTO> {
+  getDataByCoords(latitude: number, longitude: number): Observable<AirQualityResponse> {
+    const fullUrl = `${this.apiUrlBase}/air-quality/by-coords`;
+    const params = new HttpParams()
+      .set('lat', latitude.toString())
+      .set('lon', longitude.toString());
+    return this.http.get<AirQualityResponse>(fullUrl, { params });
+  }
+
+  getHistoryForLocationName(cityName: string): Observable<HistoricoDTO> {
     const fullUrl = `${this.apiUrlBase}/air-quality/history`;
     const params = new HttpParams().set('cityName', cityName);
     return this.http.get<HistoricoDTO>(fullUrl, { params });

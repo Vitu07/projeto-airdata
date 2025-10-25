@@ -10,10 +10,23 @@
 <main class="main-content">
   <section class="search-section">
     <h2>Consulte a qualidade do ar em tempo real</h2>
-    <p>Digite o nome de uma cidade para ver o índice e as recomendações de saúde.</p>
+    <p>Digite o nome de uma cidade para ver o índice e as recomendações de saúde.<br>Para buscar pela localização mais proxima, use o botão de geolocalização.</p>
     <div class="search-box">
       <input id="cidade" type="text" [(ngModel)]="cidadeInput" (keyup.enter)="buscarQualidadeDoAr()" placeholder="Ex: São Paulo, London, Tokyo...">
-      <button (click)="buscarQualidadeDoAr()" [disabled]="isLoading">
+
+      <button
+        type="button"
+        class="geolocation-btn"
+        (click)="buscarPorGeolocalizacao()"
+        [disabled]="isLoading"
+        title="Usar minha localização atual">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 885">
+          <path d="M470 1a233 233 0 0 0-217 199c-2 16-2 45 0 56 10 45 35 95 81 158 35 49 85 107 133 156l17 18 4-5 55-58c87-96 146-184 165-246 6-19 7-26 8-44A232 232 0 0 0 470 1m28 110c20 3 43 11 59 23a125 125 0 0 1 46 126 123 123 0 0 1-172 83 123 123 0 0 1-67-135c13-62 72-105 134-97"/><path d="m687 574-60 22-30 11-32 12-30 11-54 19-49-24-52-27-10-1A14743 14743 0 0 0 9 777q-7 6-9 17c-1 10 5 21 14 25q11 7 26 0l20-7 30-12c115-43 107-40 109-39l49 41 65 53c20 16 22 18 31 17 7 0 10-1 91-33l104-42 19-8 38 22 126 72q8 2 18-3c4-2 7-5 25-27l131-164q2-4 2-12 1-7-2-12l-6-8-48-24-85-43-42-20-8-1c-7 0-8 0-20 5m86 82c43 22 59 30 58 31l-17 22-72 90-19 24q0 2-21-10l-49-29c-55-32-52-30-51-32l111-125zm-366 14 34 18-7 9-50 54-46 50-4 4-37-31-50-41-13-11 138-70zm208-11-70 79-123 48 80-88z"/>
+        </svg>
+      </button>
+
+      <button class="search-btn" (click)="buscarQualidadeDoAr()" [disabled]="isLoading">
         <span *ngIf="!isLoading">Buscar</span>
         <span *ngIf="isLoading">Buscando...</span>
       </button>
