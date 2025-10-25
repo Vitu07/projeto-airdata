@@ -8,6 +8,15 @@ public class HistoricoDTO {
     private int aqiMin;
     private double aqiAvg;
     private List<MedicaoDiariaDTO> historicoDiario;
+    private String poluentePredominanteDescricao;
+
+    public String getPoluentePredominanteDescricao() {
+        return poluentePredominanteDescricao;
+    }
+
+    public void setPoluentePredominanteDescricao(String poluentePredominanteDescricao) {
+        this.poluentePredominanteDescricao = poluentePredominanteDescricao;
+    }
 
     public int getAqiMax() {
         return aqiMax;

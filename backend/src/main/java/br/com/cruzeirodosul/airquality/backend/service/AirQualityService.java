@@ -6,9 +6,11 @@ import br.com.cruzeirodosul.airquality.backend.dto.MedicaoDiariaDTO;
 import br.com.cruzeirodosul.airquality.backend.model.Localizacao;
 import br.com.cruzeirodosul.airquality.backend.model.Medicao;
 import br.com.cruzeirodosul.airquality.backend.model.NivelRisco;
+import br.com.cruzeirodosul.airquality.backend.model.Poluente;
 import br.com.cruzeirodosul.airquality.backend.repository.LocalizacaoRepository;
 import br.com.cruzeirodosul.airquality.backend.repository.MedicaoRepository;
 import br.com.cruzeirodosul.airquality.backend.repository.NivelRiscoRepository;
+import br.com.cruzeirodosul.airquality.backend.repository.PoluenteRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,9 @@ public class AirQualityService {
 
     @Autowired
     private LocalizacaoRepository localizacaoRepository;
+
+    @Autowired
+    private PoluenteRepository poluenteRepository;
 
     @Value("${API_URL}")
     private String apiURL;
@@ -143,11 +148,26 @@ public class AirQualityService {
                 })
                 .collect(Collectors.toList());
 
+        String poluenteMaisFrequentePeriodo = medicoes.stream()
+                .filter(m -> m.getPoluenteDominante() != null)
+                .map(m -> m.getPoluenteDominante().getNome())
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("N/D");
+
+        String descricaoPoluente = poluenteRepository.findByNome(poluenteMaisFrequentePeriodo)
+                .map(Poluente::getDescricao)
+                .orElse("Informação sobre este poluente não disponível.");
+
+
         HistoricoDTO dto = new HistoricoDTO();
         dto.setAqiMax(stats.getMax());
         dto.setAqiMin(stats.getMin());
         dto.setAqiAvg(stats.getAverage());
         dto.setHistoricoDiario(historicoParaGrafico);
+        dto.setPoluentePredominanteDescricao(descricaoPoluente);
 
         return dto;
     }

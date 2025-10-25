@@ -9,4 +9,5 @@ export interface HistoricoDTO {
   aqiMin: number;
   aqiAvg: number;
   historicoDiario: MedicaoDiariaDTO[];
+  poluentePredominanteDescricao: String;
 }

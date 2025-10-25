@@ -3,21 +3,25 @@
     <div class="dashboard-container">
       <h3>Análise dos Últimos 7 Dias</h3>
       <div class="stats-cards">
-        <div class="stat-card">
+        <div class="stat-card tooltip-container-card">
           <span class="label">IQAr Mín.</span>
           <span class="value">{{ histData.aqiMin }}</span>
+          <span class="tooltip-text">Menor índice de qualidade do ar registrado nos últimos 7 dias</span>
         </div>
-        <div class="stat-card">
+        <div class="stat-card tooltip-container-card">
           <span class="label">IQAr Méd.</span>
           <span class="value">{{ histData.aqiAvg | number:'1.0-1' }}</span>
+          <span class="tooltip-text">Média do índice de qualidade do ar registrado nos últimos 7 dias</span>
         </div>
-        <div class="stat-card">
+        <div class="stat-card tooltip-container-card">
           <span class="label">IQAr Máx.</span>
           <span class="value">{{ histData.aqiMax }}</span>
+          <span class="tooltip-text">Maior índice de qualidade do ar registrado nos últimos 7 dias</span>
         </div>
-        <div class="stat-card">
+        <div class="stat-card tooltip-container-card">
           <span class="label">Poluente Predominante</span>
           <span class="value">{{ poluentePredominantePeriodo | uppercase }}</span>
+          <span class="tooltip-text">{{histData.poluentePredominanteDescricao}}</span>
         </div>
       </div>
       <div class="chart-container">

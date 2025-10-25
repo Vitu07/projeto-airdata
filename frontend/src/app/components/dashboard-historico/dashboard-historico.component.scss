@@ -18,6 +18,62 @@ h3 {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 2rem;
+  .stat-card:first-child {
+    .value {
+      color: #28a745;
+    }
+  }
+
+  .stat-card:nth-child(2) {
+    .value {
+      color: #dfae07;
+    }
+  }
+  .stat-card:nth-child(3) {
+    .value {
+      color: #dc3545;
+    }
+  }
+  .stat-card.tooltip-container-card {
+    position: relative;
+  }
+  .tooltip-container-card .tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    width: 240px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.5;
+    position: absolute;
+    z-index: 10;
+    bottom: 105%;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    left: 50%;
+    margin-left: -120px;
+    right: auto;
+    margin-right: auto;
+    transform: none;
+  }
+  .tooltip-container-card .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+  .tooltip-container-card:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
 }
 .stat-card {
   text-align: center;
@@ -41,42 +97,18 @@ h3 {
   height: 300px;
 }
 
-.stats-cards {
-  .stat-card:first-child {
-    .value {
-      color: #28a745;
-    }
-  }
-
-  .stat-card:nth-child(2) {
-    .value {
-      color: #dfae07;
-    }
-  }
-
-  .stat-card:nth-child(3) {
-    .value {
-      color: #dc3545;
-    }
-  }
-}
-
 /* --- Media Queries para Responsividade Móvel --- */
 @media (max-width: 768px) {
-
   .stats-cards {
     flex-direction: column;
     gap: 0.75rem;
   }
-
   .chart-container {
     height: 250px;
   }
-
   .stat-card {
     padding: 0.8rem;
   }
-
   .stat-card .value {
     font-size: 1.6rem;
   }
