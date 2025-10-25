@@ -28,4 +28,13 @@ public class AirQualityController {
         HistoricoDTO historico = service.getDadosHistoricos(cityName);
         return ResponseEntity.ok(historico);
     }
+
+    @GetMapping("/by-coords")
+    public ResponseEntity<AirQualityResponseDTO> getAirQualityByCoords(
+            @RequestParam("lat") double latitude,
+            @RequestParam("lon") double longitude) {
+
+        AirQualityResponseDTO response = service.getAirQualityDataByCoords(latitude, longitude);
+        return ResponseEntity.ok(response);
+    }
 }

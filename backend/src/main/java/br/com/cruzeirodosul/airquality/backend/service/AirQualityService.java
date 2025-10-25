@@ -58,42 +58,56 @@ public class AirQualityService {
 
         try {
             String jsonResponse = restTemplate.getForObject(fullUrl, String.class);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode root = objectMapper.readTree(jsonResponse);
-
-            if (!"ok".equals(root.path("status").asText())) {
-                AirQualityResponseDTO errorDto = new AirQualityResponseDTO();
-                errorDto.setDadosApiExterna(root.path("data"));
-                return errorDto;
-            }
-
-            JsonNode dataNode = root.path("data");
-            int aqiValue = dataNode.path("aqi").asInt();
-
-            NivelRisco nivelRisco = nivelRiscoRepository.findByAqiValue(aqiValue)
-                    .orElse(null);
-
-            AirQualityResponseDTO responseDTO = new AirQualityResponseDTO();
-            responseDTO.setDadosApiExterna(dataNode);
-
-            if (nivelRisco != null) {
-                responseDTO.setClassificacaoRisco(nivelRisco.getClassificacao());
-
-                List<String> recomendacoes = nivelRisco.getRiscoRecomendacoes().stream()
-                        .map(rr -> rr.getRecomendacao().getTextoRecomendacao())
-                        .collect(Collectors.toList());
-                responseDTO.setRecomendacoes(recomendacoes);
-            } else {
-                responseDTO.setRecomendacoes(Collections.emptyList());
-            }
-
-            return responseDTO;
-
+            return parseApiResponse(jsonResponse);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public AirQualityResponseDTO getAirQualityDataByCoords(double latitude, double longitude) {
+        String fullUrl = String.format("%s/feed/geo:%f;%f/?token=%s", apiURL, latitude, longitude, apiKey);
+
+        try {
+            String jsonResponse = restTemplate.getForObject(fullUrl, String.class);
+            return parseApiResponse(jsonResponse);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private AirQualityResponseDTO parseApiResponse(String jsonResponse) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode root = objectMapper.readTree(jsonResponse);
+
+        if (!"ok".equals(root.path("status").asText())) {
+            AirQualityResponseDTO errorDto = new AirQualityResponseDTO();
+            errorDto.setDadosApiExterna(root.path("data"));
+            return errorDto;
+        }
+
+        JsonNode dataNode = root.path("data");
+        int aqiValue = dataNode.path("aqi").asInt();
+
+        NivelRisco nivelRisco = nivelRiscoRepository.findByAqiValue(aqiValue)
+                .orElse(null);
+
+        AirQualityResponseDTO responseDTO = new AirQualityResponseDTO();
+        responseDTO.setDadosApiExterna(dataNode);
+
+        if (nivelRisco != null) {
+            responseDTO.setClassificacaoRisco(nivelRisco.getClassificacao());
+
+            List<String> recomendacoes = nivelRisco.getRiscoRecomendacoes().stream()
+                    .map(rr -> rr.getRecomendacao().getTextoRecomendacao())
+                    .collect(Collectors.toList());
+            responseDTO.setRecomendacoes(recomendacoes);
+        } else {
+            responseDTO.setRecomendacoes(Collections.emptyList());
+        }
+
+        return responseDTO;
     }
 
     public HistoricoDTO getDadosHistoricos(String cityName) {
