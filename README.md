@@ -27,7 +27,7 @@ Para rodar este projeto localmente, você precisará ter instalado:
     * Abra o PgAdmin e crie um novo banco de dados com o nome: `airdata`
 3.  **Execute os Scripts SQL:**
     * Abra uma "Query Tool" no PgAdmin para o banco `airdata`.
-    * Execute o script `airdata_schema.sql` (disponível no projeto) para criar todas as tabelas.
+    * Execute o script `schema.sql` (disponível no projeto) para criar todas as tabelas.
     * Execute o script `carga_dados.sql` (disponível no projeto) para popular o banco com dados de teste para todas as Sprints.
 4.  **Configure a API Externa:**
     * Obtenha uma chave de API gratuita do site [AQICN (World Air Quality Index)](https://aqicn.org/data-platform/token/).
