@@ -21,7 +21,7 @@ Para rodar este projeto localmente, você precisará ter instalado:
 
 1.  **Clone o Repositório:**
     ```bash
-    git clone [https://github.com/Vitu07/projeto-airdata]
+    git clone https://github.com/Vitu07/projeto-airdata
     ```
 2.  **Configure o Banco de Dados:**
     * Abra o PgAdmin e crie um novo banco de dados com o nome: `airdata`
